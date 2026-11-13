@@ -42,7 +42,9 @@
 body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
 button,input,select{font:inherit;color:inherit}
 .wrap{max-width:1280px;margin:0 auto;padding:0 16px 40px}
-header.hero{background:var(--g-hero);color:#fff;padding:calc(18px + env(safe-area-inset-top)) 0 70px}
+header.hero{background:var(--g-hero);color:#fff;padding:calc(18px + env(safe-area-inset-top)) 0 14px}
+.navwrap{max-width:1280px;margin:0 auto;padding:0 16px}
+.wrap.main{padding-top:18px}
 .auth{position:fixed;inset:0;z-index:200;background:var(--g-hero);display:grid;place-items:center;padding:16px;overflow:auto}
 .auth-card{background:var(--surface);color:var(--text);border-radius:22px;padding:26px 22px;width:100%;max-width:380px;display:grid;gap:12px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
 .auth-card h2{margin:0;text-align:center;font-size:22px}
@@ -63,7 +65,16 @@ header.hero{background:var(--g-hero);color:#fff;padding:calc(18px + env(safe-are
 .hero-ctl input::-webkit-calendar-picker-indicator{filter:invert(1)}
 .hero-ctl button{cursor:pointer}
 .hero-ctl button:hover{background:rgba(255,255,255,.3)}
-nav.tabs{display:flex;gap:6px;margin-top:-58px;margin-bottom:22px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+nav.tabs{display:flex;gap:6px;margin-top:16px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+@media (max-width:700px){ /* điện thoại: lưới 3 cột, thấy hết mọi mục */
+  nav.tabs{flex-wrap:wrap;overflow:visible;margin-top:12px;padding-bottom:0}
+  nav.tabs button{flex:1 1 calc((100% - 12px)/3);min-width:0;padding:9px 4px;font-size:13px;text-align:center;border-radius:11px}
+  nav.tabs .lg{display:none}
+  .hero-ctl{width:100%;flex-wrap:nowrap;gap:6px}
+  .hero-ctl input{flex:1;min-width:0;padding:7px 8px}
+  .hero-ctl button{flex:none;padding:7px 9px}
+  #accBtn{font-size:0}#accBtn::before{content:attr(data-ic);font-size:15px}
+}
 nav.tabs::-webkit-scrollbar{display:none}
 nav.tabs button{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.16);color:#fff;padding:9px 16px;border-radius:12px;cursor:pointer;white-space:nowrap;font-weight:600;backdrop-filter:blur(4px)}
 nav.tabs button:hover{background:rgba(255,255,255,.28)}
@@ -249,18 +260,20 @@ label.f{display:grid;gap:4px;font-size:12px;color:var(--text-2)}
       <button id="themeBtn" title="Đổi giao diện sáng/tối">🌓</button>
     </div>
   </div>
+  <div class="navwrap">
+    <nav class="tabs">
+      <button data-tab="dash" class="on">📊 Tổng quan</button>
+      <button data-tab="tx">🧾 Thu chi</button>
+      <button data-tab="budget">🎯 Ngân sách</button>
+      <button data-tab="cards">💳 Thẻ<span class="lg"> & hoàn tiền</span></button>
+      <button data-tab="report">📋 Báo cáo<span class="lg"> gọn</span></button>
+      <button data-tab="settings">⚙️ Cài đặt</button>
+      <button data-tab="admin" hidden>👑 Quản trị</button>
+    </nav>
+  </div>
 </header>
 
-<div class="wrap">
-  <nav class="tabs">
-    <button data-tab="dash" class="on">📊 Tổng quan</button>
-    <button data-tab="tx">🧾 Thu chi</button>
-    <button data-tab="budget">🎯 Ngân sách</button>
-    <button data-tab="cards">💳 Thẻ & hoàn tiền</button>
-    <button data-tab="report">📋 Báo cáo gọn</button>
-    <button data-tab="settings">⚙️ Cài đặt</button>
-    <button data-tab="admin" hidden>👑 Quản trị</button>
-  </nav>
+<div class="wrap main">
 
   <div id="viewAsBar" class="banner noprint" hidden style="background:linear-gradient(90deg,rgba(98,80,214,.2),rgba(42,120,214,.12));border-color:rgba(98,80,214,.5)"><span id="viewAsTxt"></span><button class="btn pri" id="viewAsExit">⬅️ Về bảng quản trị</button></div>
   <div id="alertBar" class="alertbar noprint" hidden></div>
@@ -801,7 +814,7 @@ function showUserTabs(on){
 }
 function updAccUI(){
   const b=$('accBtn');if(!AUTH){b.hidden=true;return}b.hidden=false;
-  b.textContent=isAdmin()?(VIEW_AS?'👑 '+maskPhone(VIEW_AS.phone):'👑 Admin'):'👤 '+maskPhone(AUTH.phone);
+  b.textContent=isAdmin()?(VIEW_AS?'👑 '+maskPhone(VIEW_AS.phone):'👑 Admin'):'👤 '+maskPhone(AUTH.phone);b.dataset.ic=isAdmin()?'👑':'👤';
   $('accInfo').innerHTML=VIEW_AS?`👑 Quản trị viên đang xem tài khoản <b>${esc(VIEW_AS.phone)}</b>. Mọi thay đổi sẽ lưu thẳng vào tài khoản này.`
     :`Đăng nhập bằng <b>${esc(AUTH.phone)}</b> · ${isAdmin()?'Quản trị viên':'Tài khoản gia đình'}`;
   $('pwBox').hidden=!!VIEW_AS;$('logoutBtn').textContent=VIEW_AS?'⬅️ Về bảng quản trị':'🚪 Đăng xuất';
