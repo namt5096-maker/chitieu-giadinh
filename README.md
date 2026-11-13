@@ -1,36 +1,40 @@
 # 💸 Chi tiêu gia đình
 
-Web app quản lý thu chi gia đình: biểu đồ, ngân sách theo nhóm, cảnh báo hạn mức, thẻ tín dụng và hoàn tiền, báo cáo gọn.
-Chạy miễn phí trên GitHub Pages. Dữ liệu đồng bộ qua **Google Sheet của riêng bạn** (không nằm trong repo này).
+Web app quản lý thu chi cho **nhiều gia đình**. Mỗi gia đình tự đăng ký bằng **số điện thoại và mật khẩu**, dữ liệu của từng tài khoản tách riêng.
+Tài khoản **quản trị** xem và quản lý được tất cả tài khoản.
 
-## Cài đồng bộ Google Sheet (làm 1 lần, khoảng 10 phút, trên máy tính)
+Tính năng: biểu đồ, ngân sách theo nhóm, cảnh báo hạn mức, thẻ tín dụng và hoàn tiền, báo cáo gọn, cài lên iPhone như một app.
+Chạy miễn phí: giao diện trên GitHub Pages, máy chủ và dữ liệu trên Google Sheet và Apps Script của chủ hệ thống (không nằm trong repo này).
 
-1. Vào https://sheets.new để tạo một Google Sheet mới, đặt tên ví dụ **Chi tiêu gia đình**.
-2. Trên menu chọn **Tiện ích mở rộng → Apps Script**.
-3. Xoá hết code mẫu, dán toàn bộ nội dung file [`apps-script/Code.gs`](apps-script/Code.gs).
-4. Ở dòng `const MAT_KHAU = 'doi-mat-khau-nay-di';`, đổi thành mật khẩu riêng của gia đình (ít nhất 8 ký tự). Bấm 💾 **Lưu**.
-5. Chọn hàm **caiDat** ở thanh trên, bấm **▶ Chạy**, rồi cấp quyền:
-   - Chọn tài khoản Google của bạn.
-   - Nếu hiện "Google chưa xác minh ứng dụng này", bấm **Nâng cao → Đi tới … (không an toàn)**. Đây là script của chính bạn nên không sao.
-   - Bấm **Cho phép**.
-6. Bấm **Triển khai → Tác vụ triển khai mới**:
-   - Bấm ⚙️, chọn loại **Ứng dụng web**.
-   - **Thực thi với tư cách:** Tôi.
-   - **Người có quyền truy cập:** **Bất kỳ ai**.
-   - Bấm **Triển khai** rồi **sao chép URL ứng dụng web** (có dạng `https://script.google.com/macros/s/…/exec`).
-7. Mở app trên máy tính, vào **⚙️ Cài đặt → Đồng bộ**, dán URL và mật khẩu, rồi bấm **🔗 Kết nối & đồng bộ**.
+## Cài máy chủ (làm 1 lần, trên máy tính)
 
-> Sau này nếu sửa code Apps Script: **Triển khai → Quản lý tác vụ triển khai → ✏️ → Phiên bản: Phiên bản mới → Triển khai** (giữ nguyên URL).
+1. Vào https://sheets.new để tạo một Google Sheet mới, đặt tên ví dụ **Chi tiêu – Máy chủ**.
+2. Chọn **Tiện ích mở rộng → Apps Script**, xoá code mẫu rồi dán toàn bộ file [`apps-script/Code.gs`](apps-script/Code.gs).
+3. Ở đầu file, điền **SĐT và mật khẩu admin** vào `ADMIN_SDT` / `ADMIN_MK`, sau đó bấm 💾 **Lưu**.
+   *(Chỉ điền trong Apps Script, không đưa lên GitHub.)*
+4. Chọn hàm **caiDat** rồi bấm **▶ Chạy** và cấp quyền.
+   - Nếu hiện "Google chưa xác minh ứng dụng này", bấm **Nâng cao → Đi tới… → Cho phép**.
+5. Bấm **Triển khai → Tác vụ triển khai mới → ⚙️ Ứng dụng web**, chọn:
+   - *Thực thi với tư cách:* **Tôi**
+   - *Người có quyền truy cập:* **Bất kỳ ai**
+6. Bấm **Triển khai**, rồi sao chép **URL ứng dụng web** (`https://script.google.com/macros/s/…/exec`).
+7. Dán URL đó vào file [`config.js`](config.js): `window.API_URL = '…/exec';`, rồi commit và push. Từ đó mọi người mở web là đăng ký hoặc đăng nhập được ngay.
+
+> Sửa code Apps Script sau này: **Triển khai → Quản lý tác vụ triển khai → ✏️ → Phiên bản mới → Triển khai** (URL giữ nguyên).
+
+## Dữ liệu trong Google Sheet
+
+- `TaiKhoan`: danh sách tài khoản. Mật khẩu chỉ lưu dạng **băm (hash) có salt**, không ai đọc được mật khẩu gốc.
+- `DuLieu`: các giao dịch, cột *Tài khoản* cho biết giao dịch thuộc gia đình nào.
+- `CauHinhTK`: nhóm chi, hạn mức và thẻ của từng tài khoản.
 
 ## Cài lên iPhone
 
-1. Trên máy tính đã kết nối, vào **Cài đặt → 📲 Mã cài đặt cho thiết bị khác**.
-2. Trên iPhone, mở link app bằng **Safari**, bấm nút **Chia sẻ ⬆️ → Thêm vào MH chính**.
-3. Mở app từ icon vừa tạo trên màn hình chính, vào **⚙️ Cài đặt**, dán **mã cài đặt** (gửi qua Zalo cho chính mình rồi sao chép), sau đó bấm **Kết nối**.
-   - Lưu ý: app trên màn hình chính có bộ nhớ riêng, tách khỏi Safari, nên phải dán mã **trong app**.
+Mở link web bằng **Safari**, bấm **Chia sẻ ⬆️ → Thêm vào MH chính**, mở icon ₫ vừa tạo rồi đăng nhập bằng SĐT và mật khẩu.
 
 ## Bảo mật
 
-- Repo này công khai nhưng **không chứa dữ liệu hay mật khẩu**. Dữ liệu nằm trong Google Sheet của bạn.
-- Mật khẩu gia đình chỉ nằm trong Apps Script (riêng tư) và trên từng thiết bị đã kết nối.
-- Không commit file sao lưu `chitieu_backup_*.json` lên repo.
+- Mật khẩu được băm SHA-256 nhiều vòng có salt. Phiên đăng nhập dùng token ký HMAC, hết hạn sau 180 ngày, và bị huỷ khi đổi hoặc đặt lại mật khẩu.
+- Sai mật khẩu 5 lần sẽ bị chặn đăng nhập 10 phút.
+- Tài khoản bị khoá bị đăng xuất ngay ở lần đồng bộ kế tiếp.
+- Repo công khai nhưng **không chứa dữ liệu, mật khẩu hay SĐT admin**.
