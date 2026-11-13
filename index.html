@@ -42,7 +42,7 @@
 body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
 button,input,select{font:inherit;color:inherit}
 .wrap{max-width:1280px;margin:0 auto;padding:0 16px 40px}
-header.hero{background:var(--g-hero);color:#fff;padding:calc(18px + env(safe-area-inset-top)) 0 54px}
+header.hero{background:var(--g-hero);color:#fff;padding:calc(18px + env(safe-area-inset-top)) 0 70px}
 .auth{position:fixed;inset:0;z-index:200;background:var(--g-hero);display:grid;place-items:center;padding:16px;overflow:auto}
 .auth-card{background:var(--surface);color:var(--text);border-radius:22px;padding:26px 22px;width:100%;max-width:380px;display:grid;gap:12px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
 .auth-card h2{margin:0;text-align:center;font-size:22px}
@@ -63,9 +63,11 @@ header.hero{background:var(--g-hero);color:#fff;padding:calc(18px + env(safe-are
 .hero-ctl input::-webkit-calendar-picker-indicator{filter:invert(1)}
 .hero-ctl button{cursor:pointer}
 .hero-ctl button:hover{background:rgba(255,255,255,.3)}
-nav.tabs{display:flex;gap:6px;margin-top:-38px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
-nav.tabs button{border:0;background:var(--surface);color:var(--text-2);padding:9px 16px;border-radius:12px;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow);font-weight:600}
-nav.tabs button.on{background:var(--text);color:var(--surface)}
+nav.tabs{display:flex;gap:6px;margin-top:-58px;margin-bottom:22px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.16);color:#fff;padding:9px 16px;border-radius:12px;cursor:pointer;white-space:nowrap;font-weight:600;backdrop-filter:blur(4px)}
+nav.tabs button:hover{background:rgba(255,255,255,.28)}
+nav.tabs button.on{background:#fff;color:#0b0b0b;border-color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.15)}
 .tab{display:none}.tab.on{display:block}
 .grid{display:grid;gap:14px}
 .kpis{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
