@@ -62,8 +62,7 @@ const ACTIONS = {
   sync(req) {
     const a = auth(req);
     let target = a.phone;
-    if (a.role === 'admin') {
-      if (!req.as) fail('Tài khoản quản trị không có dữ liệu riêng');
+    if (a.role === 'admin' && req.as) { // admin xem/sửa tài khoản khác; không có "as" = dữ liệu riêng của admin
       target = normPhone(req.as);
       if (!findAcc(target)) fail('Không tìm thấy tài khoản ' + target);
     }

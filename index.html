@@ -69,6 +69,11 @@ nav.tabs button.on{background:var(--text);color:var(--surface)}
 .tab{display:none}.tab.on{display:block}
 .grid{display:grid;gap:14px}
 .kpis{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.kpis.k6,.kpis.k5{grid-template-columns:repeat(2,1fr)}
+@media (min-width:640px){.kpis.k6,.kpis.k5{grid-template-columns:repeat(3,1fr)}}
+@media (min-width:1100px){.kpis.k5{grid-template-columns:repeat(5,1fr)}}
+@media (min-width:1200px){.kpis.k6{grid-template-columns:repeat(6,1fr)}.kpis.k6 .kpi .v{font-size:17px}}
+@media (max-width:639px){.kpi{padding-left:14px}.kpi .ic{position:static;margin-bottom:6px;width:30px;height:30px;font-size:15px}.kpi .v{font-size:16px}}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow);min-width:0}
 .card h3{margin:0 0 2px;font-size:15px}
 .card .sub{color:var(--muted);font-size:12px;margin-bottom:10px}
@@ -82,9 +87,11 @@ nav.tabs button.on{background:var(--text);color:var(--surface)}
 .row3{grid-template-columns:repeat(3,1fr);margin-top:14px}
 .row2b{grid-template-columns:1fr 1fr;margin-top:14px}
 @media (max-width:980px){.row2,.row3,.row2b{grid-template-columns:1fr}}
+@media (max-width:1100px){.row2{grid-template-columns:1fr}}
+.grid>*{min-width:0}
 .chartbox{position:relative;height:280px}
 .chartbox.sm{height:220px}
-.donut-wrap{display:grid;grid-template-columns:200px 1fr;gap:12px;align-items:center}
+.donut-wrap{display:grid;grid-template-columns:minmax(150px,200px) minmax(0,1fr);gap:12px;align-items:center}
 @media (max-width:520px){.donut-wrap{grid-template-columns:1fr}}
 .donut-box{position:relative;height:200px}
 .donut-center{position:absolute;inset:0;display:grid;place-items:center;text-align:center;pointer-events:none}
@@ -244,13 +251,13 @@ label.f{display:grid;gap:4px;font-size:12px;color:var(--text-2)}
 
 <div class="wrap">
   <nav class="tabs">
-    <button data-tab="admin" hidden>👑 Quản trị</button>
     <button data-tab="dash" class="on">📊 Tổng quan</button>
     <button data-tab="tx">🧾 Thu chi</button>
     <button data-tab="budget">🎯 Ngân sách</button>
     <button data-tab="cards">💳 Thẻ & hoàn tiền</button>
     <button data-tab="report">📋 Báo cáo gọn</button>
     <button data-tab="settings">⚙️ Cài đặt</button>
+    <button data-tab="admin" hidden>👑 Quản trị</button>
   </nav>
 
   <div id="viewAsBar" class="banner noprint" hidden style="background:linear-gradient(90deg,rgba(98,80,214,.2),rgba(42,120,214,.12));border-color:rgba(98,80,214,.5)"><span id="viewAsTxt"></span><button class="btn pri" id="viewAsExit">⬅️ Về bảng quản trị</button></div>
@@ -262,7 +269,7 @@ label.f{display:grid;gap:4px;font-size:12px;color:var(--text-2)}
 
   <!-- ===================== DASHBOARD ===================== -->
   <section class="tab on" id="tab-dash">
-    <div class="grid kpis" id="kpis"></div>
+    <div class="grid kpis k6" id="kpis"></div>
 
     <div class="grid row2">
       <div class="card">
@@ -378,7 +385,7 @@ label.f{display:grid;gap:4px;font-size:12px;color:var(--text-2)}
 
   <!-- ===================== BUDGET ===================== -->
   <section class="tab" id="tab-budget">
-    <div class="grid kpis" id="budKpis"></div>
+    <div class="grid kpis k5" id="budKpis"></div>
     <div class="grid row2b">
       <div class="card">
         <h3>🎯 Tình hình ngân sách</h3>
@@ -421,7 +428,7 @@ label.f{display:grid;gap:4px;font-size:12px;color:var(--text-2)}
 
   <!-- ===================== CREDIT CARDS ===================== -->
   <section class="tab" id="tab-cards">
-    <div class="grid kpis" id="cbKpis"></div>
+    <div class="grid kpis k5" id="cbKpis"></div>
 
     <div class="card" style="margin-top:14px">
       <div class="ccm-head">
@@ -563,7 +570,7 @@ label.f{display:grid;gap:4px;font-size:12px;color:var(--text-2)}
         <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="admReload">🔄 Tải lại</button><button class="btn" id="admPw">🔑 Đổi mật khẩu admin</button><button class="btn" id="admLogout">🚪 Đăng xuất</button></div>
       </div>
     </div>
-    <div class="grid kpis" id="admKpis"></div>
+    <div class="grid kpis k5" id="admKpis"></div>
     <div class="grid row2b">
       <div class="card">
         <h3>➕ Tạo tài khoản cho gia đình</h3>
@@ -661,7 +668,7 @@ let AUTH=null,VIEW_AS=null; // VIEW_AS = {phone,name} khi admin đang xem 1 tài
 try{AUTH=JSON.parse(localStorage.getItem(LS_AUTH))}catch(e){}
 const API=()=>((window.API_URL||'').trim()||(localStorage.getItem(LS_API)||'').trim());
 const isAdmin=()=>!!(AUTH&&AUTH.role==='admin');
-const userMode=()=>!!(AUTH&&(!isAdmin()||VIEW_AS));
+const userMode=()=>!!AUTH; // admin cũng có thu chi riêng như tài khoản thường
 let LS_SY='qlct_sync_v2',SY={};
 function resetSY(){SY={since:0,cfgU:0,cfgHash:'',pending:{},dead:{},lastOk:0,lastErr:''}}
 function loadSY(){resetSY();try{Object.assign(SY,JSON.parse(localStorage.getItem(LS_SY))||{})}catch(e){}}
@@ -721,7 +728,7 @@ async function syncOnce(manual){
   Object.keys(sentD).forEach(id=>tx.push({id,deleted:true,u:sentD[id]}));
   let ok=false;
   try{
-    const d=await api('sync',{as:VIEW_AS?VIEW_AS.phone:'',since:SY.since,first,tx,cfg:cfgObj(),cfgU:SY.cfgU});
+    const d=await api('sync',{as:VIEW_AS?VIEW_AS.phone:(isAdmin()?AUTH.phone:''),since:SY.since,first,tx,cfg:cfgObj(),cfgU:SY.cfgU});
     if(acct!==LS||!S)return false; // đã đổi tài khoản trong lúc chờ
     Object.keys(sentP).forEach(id=>{if(SY.pending[id]===sentP[id])delete SY.pending[id]});
     Object.keys(sentD).forEach(id=>{if(SY.dead[id]===sentD[id])delete SY.dead[id]});
@@ -777,14 +784,12 @@ async function logout(force){
     localStorage.removeItem(LS_AUTH)}catch(e){}
   history.replaceState(null,'',location.pathname);location.reload();
 }
-function startSession(tab){
-  if(isAdmin())enterAdmin();else openAccount(AUTH.phone,tab);
-}
+function startSession(tab){openAccount(AUTH.phone,tab)}
 function openAccount(phone,tab){
   const pre=VIEW_AS?'adm_':'';LS='qlct_data_'+pre+phone;LS_SY='qlct_sync_'+pre+phone;
   snapReady=false;clearTimeout(syncTimer);loadSY();load();initSnap();
   showUserTabs(true);setType('chi');resetForm();updateBanner();updAccUI();
-  gotoTab(tab&&tab!=='admin'&&document.querySelector(`nav.tabs [data-tab="${tab}"]`)?tab:'dash');
+  gotoTab(tab&&(tab!=='admin'||isAdmin())&&document.querySelector(`nav.tabs [data-tab="${tab}"]`)?tab:'dash');
   syncStatus();syncNow();
 }
 function showUserTabs(on){
@@ -799,16 +804,15 @@ function updAccUI(){
     :`Đăng nhập bằng <b>${esc(AUTH.phone)}</b> · ${isAdmin()?'Quản trị viên':'Tài khoản gia đình'}`;
   $('pwBox').hidden=!!VIEW_AS;$('logoutBtn').textContent=VIEW_AS?'⬅️ Về bảng quản trị':'🚪 Đăng xuất';
 }
-function enterAdmin(){VIEW_AS=null;S=null;snapReady=false;clearTimeout(syncTimer);showUserTabs(false);updAccUI();syncStatus();gotoTab('admin')}
 async function viewAs(u){
-  if(VIEW_AS)await leaveView(true);
+  if(VIEW_AS)await leaveView(true);else if(pendingCount())await syncNow(); // gửi nốt thay đổi của chính admin
   VIEW_AS={phone:u.phone,name:u.name||''};clearCache('adm_',u.phone);openAccount(u.phone,'dash');toast('👁️ Đang tải dữ liệu '+u.phone);
 }
 async function leaveView(silent){
   if(!VIEW_AS)return;
   if(pendingCount())await syncNow();
   clearCache('adm_',VIEW_AS.phone);
-  if(silent)VIEW_AS=null;else{enterAdmin();renderAdmin(true)}
+  VIEW_AS=null;if(!silent){openAccount(AUTH.phone,'admin');renderAdmin(true)}
 }
 
 /* ---- bảng quản trị ---- */
@@ -983,7 +987,7 @@ function renderDash(){
     borderColor:cssv('--surface'),borderWidth:2,hoverOffset:6,borderRadius:4}]},
     options:{cutout:'68%',maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:c=>` ${fmt(c.raw)} (${(c.raw/C*100).toFixed(1)}%)`}}}}});
   $('donutCenter').innerHTML=`<div><b>${short(C)}</b><span>tổng chi</span></div>`;
-  $('donutLegend').innerHTML=cats.sort((a,b)=>bc[b.id]-bc[a.id]).map(c=>`<li><i style="background:${catColor(c.id)}"></i><span>${c.icon} ${esc(c.name)}</span><b>${short(bc[c.id])}</b><span class="pc">${(bc[c.id]/C*100).toFixed(0)}%</span></li>`).join('')||'<li class="muted">Chưa có khoản chi</li>';
+  $('donutLegend').innerHTML=cats.sort((a,b)=>bc[b.id]-bc[a.id]).map(c=>`<li><i style="background:${catColor(c.id)}"></i><span>${c.icon} ${esc(c.name)}</span><b>${short(bc[c.id])}</b><span class="pc">${(bc[c.id]/C*100).toFixed(0)}%</span></li>`).join('')||'<li class="muted" style="display:block">Chưa có khoản chi trong tháng</li>';
 
   /* 12 months */
   const months=[...Array(12)].map((_,i)=>shiftMonth(m,i-11));
@@ -1405,9 +1409,9 @@ function download(name,content,type){const a=document.createElement('a');a.href=
 let curTab='dash';
 function render(){
   $('month').value=curMonth;
-  if(curTab==='admin'){renderAdmin();if(!userMode()){$('alertBar').hidden=true;$('sampleBanner').hidden=true;$('heroSub').textContent='Bảng quản trị hệ thống · tháng '+mLabel(curMonth);return}}
   if(!userMode()||!S)return;
-  renderAlerts();$('heroSub').textContent=`Đang xem tháng ${mLabel(curMonth)} · ${S.tx.length} giao dịch đã ghi`;
+  renderAlerts();
+  if(curTab==='admin'){renderAdmin();$('heroSub').textContent='👑 Bảng quản trị hệ thống · tháng '+mLabel(curMonth);return}$('heroSub').textContent=`Đang xem tháng ${mLabel(curMonth)} · ${S.tx.length} giao dịch đã ghi`;
   if(curTab==='dash')renderDash();if(curTab==='tx')renderTx();if(curTab==='budget')renderBudget();if(curTab==='cards')renderCards();if(curTab==='report')renderReport();if(curTab==='settings')renderSettings();
 }
 function updateBanner(){$('sampleBanner').hidden=!S.tx.some(t=>t.sample)}
@@ -1516,7 +1520,7 @@ $('wipe').onclick=()=>{if(confirm('XOÁ TOÀN BỘ dữ liệu? Không thể ho�
 
 /* ---- sự kiện: tài khoản, đồng bộ, quản trị ---- */
 $('syncBtn').onclick=()=>{if(syncOn())syncNow(true);else if(isAdmin())gotoTab('admin');else toast('Chưa kết nối máy chủ')};
-$('accBtn').onclick=()=>gotoTab(isAdmin()&&!VIEW_AS?'admin':'settings');
+$('accBtn').onclick=()=>gotoTab('settings');
 $('syNow').onclick=()=>syncNow(true);
 $('logoutBtn').onclick=()=>VIEW_AS?leaveView():logout();
 $('pwChange').onclick=async()=>{const o=$('pwOld').value,n=$('pwNew').value;
