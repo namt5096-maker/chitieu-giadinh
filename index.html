@@ -603,7 +603,6 @@ label.f{display:grid;gap:4px;font-size:12px;color:var(--text-2)}
     <label class="f">Số điện thoại<input id="auPhone" inputmode="tel" autocomplete="username" placeholder="09xxxxxxxx"></label>
     <label class="f">Mật khẩu<input id="auPw" type="password" autocomplete="current-password" placeholder="ít nhất 6 ký tự"></label>
     <label class="f" id="auPw2Wrap" hidden>Nhập lại mật khẩu<input id="auPw2" type="password" autocomplete="new-password"></label>
-    <label class="f" id="auApiWrap" hidden>Link máy chủ (Apps Script …/exec)<input id="auApi" placeholder="https://script.google.com/macros/s/.../exec"></label>
     <button class="btn pri" id="auGo" style="width:100%;padding:12px">🔓 Đăng nhập</button>
     <div id="auMsg" class="au-msg"></div>
     <div class="muted au-note">🔐 Dữ liệu mỗi tài khoản là riêng tư, các tài khoản khác không xem được. Quản trị viên hệ thống có quyền quản lý tài khoản và truy cập dữ liệu để hỗ trợ.</div>
@@ -752,15 +751,14 @@ let authMode='login';
 function setAuthMode(m){authMode=m;[...$('auMode').children].forEach(b=>b.classList.toggle('on',b.dataset.v===m));
   $('auPw2Wrap').hidden=m!=='register';$('auGo').textContent=m==='register'?'🎉 Tạo tài khoản':'🔓 Đăng nhập';
   $('auPw').autocomplete=m==='register'?'new-password':'current-password';$('auMsg').textContent=''}
-function showAuth(msg){$('authScreen').hidden=false;$('auApiWrap').hidden=!!(window.API_URL||'').trim();
-  $('auApi').value=localStorage.getItem(LS_API)||'';$('auMsg').textContent=msg||'';setTimeout(()=>$('auPhone').focus(),100)}
+function showAuth(msg){$('authScreen').hidden=false;
+  $('auMsg').textContent=msg||(API()?'':'⚠️ Hệ thống đang bảo trì (chưa kết nối máy chủ). Vui lòng quay lại sau.');setTimeout(()=>$('auPhone').focus(),100)}
 async function doAuth(){
   const phone=normPhone($('auPhone').value),pw=$('auPw').value,msg=t=>{$('auMsg').textContent=t};
   if(!/^0\d{9}$/.test(phone))return msg('⚠️ Số điện thoại cần 10 số, bắt đầu bằng 0');
   if(pw.length<6)return msg('⚠️ Mật khẩu cần ít nhất 6 ký tự');
   if(authMode==='register'&&pw!==$('auPw2').value)return msg('⚠️ Hai lần nhập mật khẩu không khớp');
-  if(!(window.API_URL||'').trim()){const a=$('auApi').value.trim();
-    if(!/^https:\/\/script\.google\.com\//.test(a))return msg('⚠️ Nhập link máy chủ Apps Script (…/exec)');localStorage.setItem(LS_API,a)}
+  if(!API())return msg('⚠️ Hệ thống đang bảo trì (chưa kết nối máy chủ). Vui lòng quay lại sau.');
   $('auGo').disabled=true;msg('⏳ Đang xử lý...');
   try{const d=await api(authMode,{phone,pw});
     AUTH={token:d.token,phone:d.phone,role:d.role};localStorage.setItem(LS_AUTH,JSON.stringify(AUTH));
@@ -1527,7 +1525,7 @@ $('pwChange').onclick=async()=>{const o=$('pwOld').value,n=$('pwNew').value;
     $('pwOld').value='';$('pwNew').value='';toast('🔑 Đã đổi mật khẩu')}catch(e){toast('⚠️ '+e.message)}};
 $('auMode').onclick=e=>{const b=e.target.closest('button');if(b)setAuthMode(b.dataset.v)};
 $('auGo').onclick=doAuth;
-['auPhone','auPw','auPw2','auApi'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')doAuth()}));
+['auPhone','auPw','auPw2'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')doAuth()}));
 $('viewAsExit').onclick=()=>leaveView();
 $('admReload').onclick=()=>renderAdmin(true);
 $('admLogout').onclick=()=>logout();
